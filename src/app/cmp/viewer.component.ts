@@ -277,7 +277,8 @@ export class ViewerComponent implements OnInit, OnDestroy {
       this.advancedPosition();
     }
     else {
-      this.basicPosition();
+      this.advancedPosition();
+      //this.basicPosition();
     }
   }
   public basicPosition() {
