@@ -16,9 +16,11 @@ For Commercial use feel free to contact me.
 - Custom Interval: Select the duration between image changes, in minutes or seconds.
 - Display Options: Crop or not crop the image display, if not cropped it will center the image based of the height of the image, any remaining space will show a faded version of the image behind. The background color is also configurable.
 - Full Screen Mode: Allow the player to go full screen by pressing F11.
-- Power Management: It disables the power management so the display will not go to sleep.
+- Power Management: The application temporarily disables the power management so the display will not go to sleep.
 
 ![roFrame](src/assets/screenshot_4.jpg)
+
+Other screen shot can be seen in the ./src/assets directory
 
 ## Install Application without Compiling
 

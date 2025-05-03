@@ -80,6 +80,10 @@ export class SettingsComponent {
           }
         }
       }
+      else {
+        this.ipcRenderer.invoke("save-file", JSON.stringify(this.preferences));
+        this.prefService.setPreferences(this.preferences);
+      }
       this.isLoading = false;
     }
   }
