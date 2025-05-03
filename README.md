@@ -35,6 +35,13 @@ A configuration file is created in your user directory  ..\AppData\Roaming\digit
 ## Development Build / Publish:
  * npm run make
 
+Before running a "make" command make sure you delete everything in your "publish" & "out" directories.
+
+if you see the error:
+
+    This is a dummy update.exe.  If you are seeing this, your build did not correctly replace the IDR_UPDATE_ZIP resource.
+
+This probaly because you forgot to delete the "publish" & "out" directories and your exe file is too big.
 
 ## License
 
