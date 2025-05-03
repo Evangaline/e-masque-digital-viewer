@@ -1,0 +1,99 @@
+
+
+<div style="flex-direction:column;">
+  <div class="page-header">Preferences</div>
+
+  <div class="page-sub-header">Directories</div>
+  <div class="card-content">
+    <mat-card appearance="outlined" style="width:100%;">
+      <mat-card-content>
+        <table cellpadding="0" cellspacing="0" class="pref-table">
+          <thead>
+            <tr>
+              <th style="width:5%"></th>
+              <th style="width:65%">Directory</th>
+              <th colspan="2">Include Sub Folders</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (dir of preferences.directories; track dir) {
+            <tr>
+              <td><mat-icon color="warn" class="cancel-button" style="{{dir.path==''||dir.path==null ? 'display:none' : '' }}" (click)="removeDirectory(dir)">cancel</mat-icon></td>
+              <td>{{ dir.path}} </td>
+              <td style="width:15%"><mat-slide-toggle [(ngModel)]="dir.include"></mat-slide-toggle></td>
+              <td style="width:15%"><button mat-raised-button (click)="selectDirectory(dir)">Browse...</button></td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  <div class="setting-save"><button mat-raised-button (click)="reBuildPlayList()">ReBuild Play List</button></div>
+  <div class="page-sub-header">Options</div>
+  <div class="card-content">
+    <mat-card appearance="outlined" style="width:100%;">
+      <mat-card-content>
+        <div class="setting">
+          <div><mat-slide-toggle [(ngModel)]="preferences.crop"></mat-slide-toggle></div>
+          <div>Don't crop the image</div>
+        </div>
+        <div class="setting-select" [style]="preferences.crop==false ? 'display:none': ''">
+          <mat-form-field appearance="outline" style="width:50%">
+            <mat-label>Position</mat-label>
+            <mat-select [(ngModel)]="preferences.position">
+              <mat-option value="TOP">Starting at the top of the Image</mat-option>
+              <mat-option value="CENTER">Starting from the center of the Image</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="setting">
+          <div><mat-slide-toggle [(ngModel)]="preferences.useimage"></mat-slide-toggle></div>
+          <div>Use faded image on filler spaces</div>
+        </div>
+        <div style="padding-bottom:10px;">
+          <div class="settings-color">
+            <input class="color-input" [(colorPicker)]="preferences.backColor" [style.background]="preferences.backColor" />
+          </div>
+          <div class="color-text">Background color</div>
+        </div>
+        <div class="setting-select">
+          <mat-form-field appearance="outline">
+            <mat-label>Timer Rotation Interval</mat-label>
+            <input matInput placeholder="Timer Rotation Interval" [(ngModel)]="preferences.timer">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Interval</mat-label>
+            <mat-select [(ngModel)]="preferences.interval">
+              <mat-option value="M">Minute(s)</mat-option>
+              <mat-option value="S">Second(s)</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div>Image rotation timer</div>
+        </div>
+        <div class="setting-select">
+          <mat-form-field appearance="outline">
+            <mat-label>Order By</mat-label>
+            <mat-select [(ngModel)]="preferences.orderby">
+              <mat-option value="CREATED">Created Date</mat-option>
+              <mat-option value="NAME">Image Name</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Direction</mat-label>
+            <mat-select [(ngModel)]="preferences.direction">
+              <mat-option value="ASC">Ascending</mat-option>
+              <mat-option value="DESC">Descending</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div>Order images by Name or Created Date</div>
+        </div>
+
+        <mat-progress-bar mode="indeterminate" [style.display]="isLoading?'':'none'"></mat-progress-bar>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="setting-save"><button mat-raised-button (click)="saveSettings()">Save</button></div>
+</div>

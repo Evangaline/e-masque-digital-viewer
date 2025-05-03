@@ -1,0 +1,7 @@
+https://angular.dev/api/core/ChangeDetectorRef
+
+https://github.com/maximegris/angular-electron
+
+https://www.electronjs.org/docs/latest/tutorial/tutorial-packaging
+https://www.electronforge.io/config/makers
+https://www.electronforge.io/config/makers/squirrel.windows
