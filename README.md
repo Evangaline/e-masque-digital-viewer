@@ -26,8 +26,6 @@ Other screen shot can be seen in the ./src/assets directory
 
 Download the Windows exe files.
 
-https://e-masque.com/assets/digital-picture-0.0.0.zip
-
 A configuration file is created in your user directory  ..\AppData\Roaming\digital-picture\digital-picture-preferences.json
 
 ## Development Run:
