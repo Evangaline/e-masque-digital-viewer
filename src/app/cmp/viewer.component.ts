@@ -104,12 +104,13 @@ export class ViewerComponent implements OnInit, OnDestroy {
   public setPreferences(pref: Prefereneces): void {
     this.preferences = Prefereneces.fromJSON(pref);
     if (this.preferences.interval == "M") {
-      this.time = (1000 * 60) * this.preferences.timer;
+      this.time = 60 * this.preferences.timer;
     }
     else {
-      this.time = 1000 * this.preferences.timer;
+      this.time = this.preferences.timer;
     }
     this.timeLeft = this.time;
+
     //console.log("set preferences");
     //console.log("Preferences: " + JSON.stringify(this.preferences))
     this.begin();
@@ -227,7 +228,7 @@ export class ViewerComponent implements OnInit, OnDestroy {
     }
   }
   public startTimer() {
-    this.timerSubscription = timer(0, 1).subscribe(() => {
+    this.timerSubscription = timer(0, 1000).subscribe(() => {
       this.timeLeft -= 1;
       if (this.timeLeft <= 0) {
         this.timeLeft = this.time;
@@ -251,6 +252,7 @@ export class ViewerComponent implements OnInit, OnDestroy {
     this.startTimer();
   }
   public showNextPicture(): void {
+    this.stopTimer();
     this.preferences.lastPlayed = this.image;
     this.image = this.preferences.playlist[0].path;
     if (this.preferences.directories.length > 0) {
@@ -267,9 +269,8 @@ export class ViewerComponent implements OnInit, OnDestroy {
       this.prefService.setPreferences(this.preferences);
     }
 
-    this.stopTimer();
     this.positionImage();
-    this.startTimer();
+    this.start();
   }
 
   public positionImage() {
