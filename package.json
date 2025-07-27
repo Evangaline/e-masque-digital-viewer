@@ -2,7 +2,7 @@
   "name": "digital-picture",
   "author": "e-masque interactice",
   "description": "Digital picture frame application, configure directories and the application will play all the images within the chosen directories at the speed you choose.",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "main": "main.js",
   "scripts": {
     "ng": "ng",

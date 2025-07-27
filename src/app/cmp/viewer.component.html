@@ -1,15 +1,16 @@
 
-  <div class="image-viewer" style="background-color:{{preferences.backColor}};{{alignAdjustment}}">
-    <div class="back-image" style="{{backgroundImage}}"></div>
-    <img src="{{image}}" [style]="imageDisplay" />
-  </div>
-  <div class="pause-bar" [style.display]="isPaused ? '' : 'none'">PAUSED</div>
+<div class="image-viewer" style="background-color:{{preferences.backColor}};{{alignAdjustment}}">
+  <div class="back-image" style="{{backgroundImage}}"></div>
+  <img src="{{image}}" [style]="imageDisplay" />
+</div>
+<div class="pause-bar" [style.display]="isPaused ? '' : 'none'">PAUSED</div>
 
 <div class="action-buttons">
   <div><mat-icon title="Start the automatic image play" (click)="play()">play_arrow</mat-icon></div>
   <div><mat-icon title="Pause the automatic image play" (click)="pause()">pause</mat-icon></div>
-  <div><mat-icon title="Reset the play list form the chosen directories" (click)="createPlaylist()">refresh</mat-icon></div>
+  <div><mat-icon title="Reset the play list form the chosen directories" (click)="createPlaylist(false)">refresh</mat-icon></div>
   <div><mat-icon title="View the current play list" (click)="printPlaylist()">list</mat-icon></div>
+  <div><mat-icon title="Change Image Group" (click)="changeImageGroup()">filter</mat-icon></div>
   <div><mat-icon title="Skip to the next image" (click)="showNextPicture()">skip_next</mat-icon></div>
   <div [style]="preferences.lastPlayed==''||preferences.lastPlayed==null?'display:none':''"><mat-icon title="Show last image played" (click)="showPreviousPicture()">skip_previous</mat-icon></div>
   <!--<div><mat-icon title="Redraw image display" (click)="redrawImage()">brush</mat-icon></div>-->
@@ -33,7 +34,22 @@
     <div style="width: 50%; display: flex; justify-content: flex-end;"><mat-icon color="primary" (click)="previousPage()" [style.display]="playStart==0 ? 'none':''">chevron_left</mat-icon></div>
     <div style="width:50%"><mat-icon color="primary" (click)="nextPage()" [style.display]="lastPage() ? 'none' : ''">chevron_right</mat-icon></div>
   </div>
+</div>
 
+<div class="grouplist-view" [hidden]="!showGroup">
+  <div class="page-sub-header">Group List</div>
+  <div class="play-list">
+    <ul>
+      @for (grp of preferences.groups; track grp) {
+      <li [class]="grp.name==preferences.currentGroup ? 'group-select': ''">
+        <div title="Change Image Group" (click)="changeGroup(grp)">
+          <div><mat-icon style="cursor:pointer;">control_camera</mat-icon></div>
+          <div style="padding-left:10px;">{{grp.name}}</div>
+        </div>
+      </li>
+      }
+    </ul>
+  </div>
 </div>
 
 <div class="time-display">{{timeLeft}}</div>

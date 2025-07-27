@@ -3,6 +3,8 @@ import { PlayListItem } from './playList';
 
 export class Prefereneces {
   public playlist: PlayListItem[] = [];
+  public groups: DirectoryGroup[] = [];
+  public currentGroup: string = "";
   public directories: DirectoryEntry[] = [];
   public timer: number = 60;
   public crop: boolean = false;
@@ -16,6 +18,7 @@ export class Prefereneces {
 
   constructor() {
     this.playlist = [];
+    this.groups = [];
     this.directories = [];
     this.directories.push(new DirectoryEntry());
     this.timer = 60;
@@ -27,6 +30,7 @@ export class Prefereneces {
     this.direction = "ASC";
     this.lastPlayed = "";
     this.position = "CENTER"
+    this.currentGroup = "";
 }
 
   static fromJSON(json: Object): Prefereneces {
@@ -47,6 +51,13 @@ export class Prefereneces {
     }
     bWrapper.directories = vList1;
 
+    let vList2: DirectoryGroup[] = [];
+    let values2 = bWrapper.groups;
+    for (let i in values2) {
+      vList2.push(DirectoryGroup.fromJSON(values2[i]));
+    }
+    bWrapper.groups = vList2;
+   
     return bWrapper;
   }
 }
@@ -63,6 +74,30 @@ export class DirectoryEntry {
   static fromJSON(json: Object): DirectoryEntry {
     let obj = Object.create(DirectoryEntry.prototype);
     let bWrapper = Object.assign(obj, json);;
+
+    return bWrapper;
+  }
+}
+
+export class DirectoryGroup {
+  public name: string = "";
+  public directories: DirectoryEntry[] = [];
+
+  constructor() {
+    this.name = "";
+    this.directories = [];
+  }
+
+  static fromJSON(json: Object): DirectoryGroup {
+    let obj = Object.create(DirectoryGroup.prototype);
+    let bWrapper = Object.assign(obj, json);;
+
+    let vList1: DirectoryEntry[] = [];
+    let values1 = bWrapper.directories;
+    for (let i in values1) {
+      vList1.push(DirectoryEntry.fromJSON(values1[i]));
+    }
+    bWrapper.directories = vList1;
 
     return bWrapper;
   }

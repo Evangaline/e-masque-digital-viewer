@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { shell, IpcRenderer } from 'electron';
 import { readdir, stat } from 'fs';
 import { resolve } from 'path';
 
-import { Prefereneces, DirectoryEntry, PlayListItem } from '../cls/index';
+import { Prefereneces, DirectoryEntry, DirectoryGroup, PlayListItem } from '../cls/index';
 import { PreferenceService } from '../srv/index';
 
 @Component({
@@ -24,17 +24,23 @@ export class SettingsComponent {
   public color: any = "#ff0000";
   public maxCount: number = 0;
 
+  public newGroup: string = "";
+
   constructor(
             private router: Router,
+            private ref: ChangeDetectorRef,
             private prefService: PreferenceService) {
-    this.prefService.getPreferences$.subscribe(pref => this.preferences = pref);
+    this.prefService.getPreferences$.subscribe(pref => this.setPreferences(pref));
   }
 
   ngOnInit() {
     this.preferences.directories.push(new DirectoryEntry());
   }
 
-  public selectDirectory(directory: DirectoryEntry) {
+  public setPreferences(pref: Prefereneces): void {
+    this.preferences = pref;
+  }
+  public selectDirectory(directory: DirectoryEntry, group: DirectoryGroup) {
     let isNew = false;
     if ((directory.path == null) || (directory.path == "")) {
       isNew = true;
@@ -46,25 +52,26 @@ export class SettingsComponent {
 
     this.ipcRenderer.invoke('open-directory-dialog').then(d => {
       let dir: string = d;
-        if (this.preferences.directories.filter(p => p.path == dir).length == 0) {
+        if (group.directories.filter(p => p.path == dir).length == 0) {
           directory.path = dir;
           directory.include = true;
-          if (isNew == true) {
-            this.preferences.directories.push(new DirectoryEntry());
-          }
+          //if (isNew == true) {
+            group.directories.push(new DirectoryEntry());
+          //}
         }
     });
+    console.log(this.preferences);
   }
 
-  public removeDirectory(directory: DirectoryEntry) {
+  public removeDirectory(directory: DirectoryEntry, group: DirectoryGroup) {
     let idx: number = -1;
-    for (let i = 0; i < this.preferences.directories.length; i++) {
-      if (this.preferences.directories[i] === directory) {
+    for (let i = 0; i < group.directories.length; i++) {
+      if (group.directories[i] === directory) {
         idx = i;
       }
     }
     if (idx != -1) {
-      this.preferences.directories.splice(idx, 1);
+      group.directories.splice(idx, 1);
     }
   }
 
@@ -85,6 +92,16 @@ export class SettingsComponent {
         this.prefService.setPreferences(this.preferences);
       }
       this.isLoading = false;
+    }
+  }
+  public buildPlayList(grp: DirectoryGroup): void {
+    this.preferences.playlist = [];
+    this.preferences.currentGroup = grp.name;
+    this.maxCount = 0;
+    for (let i = 0; i < grp.directories.length; i++) {
+      if ((grp.directories[i].path != null) && (grp.directories[i].path != "")) {
+        this.addDirectoryFiles(grp.directories[i].path, grp.directories[i].include);
+      }
     }
   }
   public reBuildPlayList() {
@@ -153,4 +170,31 @@ export class SettingsComponent {
     });
   }
 
+  public addGroup(): void{
+    if (this.newGroup != ""){
+      if (this.preferences.groups.filter(p => p.name.toLowerCase() == this.newGroup.toLowerCase()).length == 0) {
+        let nGroup: DirectoryGroup = new DirectoryGroup();
+        nGroup.name = this.newGroup;
+        nGroup.directories = [];
+        let dir: DirectoryEntry = new DirectoryEntry();
+        nGroup.directories.push(dir);
+        this.preferences.groups.push(nGroup);
+        this.newGroup = "";
+      }
+      else {
+        //GROUP ALREADY EXISTS
+      }
+    }
+  }
+  public removeGroup(grp: DirectoryGroup): void {
+    let idx: number = -1;
+    for (let i = 0; i < this.preferences.groups.length; i++) {
+      if (grp === this.preferences.groups[i]) {
+        idx = i;
+      }
+    }
+    if (idx != -1) {
+      this.preferences.groups.splice(idx, 1);
+    }
+  }
 }

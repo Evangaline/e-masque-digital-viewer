@@ -1,3 +1,3 @@
 
-export { Prefereneces, DirectoryEntry } from './preferences';
+export { Prefereneces, DirectoryEntry, DirectoryGroup } from './preferences';
 export { PlayListItem } from './playList';
