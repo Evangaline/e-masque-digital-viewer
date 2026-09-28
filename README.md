@@ -48,7 +48,7 @@ Settings are saved automatically in your user directory:
 
 ## Requirements for Development
 
-- Node.js 22.22.3 or later (Angular 22 will not run on older versions). If you use nvm: `nvm install 26 && nvm use 26`
+- Node.js 24 LTS (recommended). Angular 22 needs 22.22.3 or later, and Node 26 is not yet supported for packaging (`npm run make` stops part way through without an error). If you use nvm: `nvm install 24 && nvm use 24`
 - Built with Angular 22, Angular Material 22 and Electron 44.
 
 ## Development Run:
