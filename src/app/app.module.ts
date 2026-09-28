@@ -16,6 +16,8 @@ import { ColorPickerComponent, ColorPickerDirective } from 'ngx-color-picker';
 import { ProgressBarMode, MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatMenuModule } from '@angular/material/menu';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 
 import { AppRoutingModule } from './app-routing.module';
@@ -37,6 +39,7 @@ import { PreferenceService } from './srv';
     AppRoutingModule,
     MatCheckboxModule,
     MatButton,
+    MatButtonModule,
     MatTooltip,
     MatIconModule,
     MatInputModule,
@@ -49,7 +52,9 @@ import { PreferenceService } from './srv';
     ColorPickerComponent,
     ColorPickerDirective,
     MatProgressBarModule,
-    MatSidenavModule
+    MatSidenavModule,
+    MatMenuModule,
+    ScrollingModule
   ],
   providers: [
     PreferenceService

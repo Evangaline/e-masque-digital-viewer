@@ -15,6 +15,8 @@ export class Prefereneces {
   public orderby: string = "CREATED";
   public direction: string = "ASC";
   public lastPlayed: string = "";
+  public transition: string = "FADE";
+  public theme: string = "SYSTEM";
 
   constructor() {
     this.playlist = [];
@@ -29,6 +31,8 @@ export class Prefereneces {
     this.orderby = "CREATED";
     this.direction = "ASC";
     this.lastPlayed = "";
+    this.transition = "FADE";
+    this.theme = "SYSTEM";
     this.position = "CENTER"
     this.currentGroup = "";
 }

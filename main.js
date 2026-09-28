@@ -1,4 +1,9 @@
-const { app, BrowserWindow, Menu, powerSaveBlocker } = require('electron/main')
+const { app, BrowserWindow, Menu, powerSaveBlocker, nativeTheme } = require('electron/main')
+
+//HANDLE SQUIRREL INSTALL/UPDATE/UNINSTALL EVENTS ON WINDOWS (CREATES SHORTCUTS) AND EXIT
+if (require('electron-squirrel-startup')) {
+  app.quit();
+}
 const path = require('path');
 const { imageSizeFromFile } = require('image-size/fromFile');
 const fs = require('fs');
@@ -15,9 +20,9 @@ function createWindow () {
     frame: true,
     fullscreenable: true,
     webPreferences: {
-      //preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: true,
-      contextIsolation: false,
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true,
     },
   })
 
@@ -36,6 +41,10 @@ function createWindow () {
   });
 
   // win.webContents.openDevTools();
+
+  //LET THE PAGE KNOW WHEN FULL SCREEN CHANGES (F11, MENU OR THE PAGE ITSELF)
+  win.on('enter-full-screen', () => win.webContents.send('fullscreen-on'));
+  win.on('leave-full-screen', () => win.webContents.send('fullscreen-off'));
 
   let blockerId = powerSaveBlocker.start('prevent-display-sleep');
 
@@ -114,7 +123,7 @@ ipcMain.handle('save-file', async (event, message) => {
 });
 
 ipcMain.handle('default-directory', async () => {
-  let filePath = path.join(__dirname, "src/assets/e-masque.png");
+  let filePath = path.join(__dirname, "dist/my-angular-app/assets/e-masque.png");
   return filePath;
 });
 
@@ -130,6 +139,42 @@ ipcMain.handle('load-file', async () => {
     json = "";
   }
   return json;
+});
+
+ipcMain.handle('set-fullscreen', async (event, full) => {
+  if (win) {
+    win.setFullScreen(full == true);
+  }
+});
+
+//LIGHT/DARK FOR THE WINDOW FRAME AND MENUS, SYSTEM FOLLOWS WINDOWS
+ipcMain.handle('set-theme', async (event, theme) => {
+  nativeTheme.themeSource = theme == 'LIGHT' ? 'light' : (theme == 'DARK' ? 'dark' : 'system');
+});
+
+ipcMain.handle('is-fullscreen', async () => {
+  return win ? win.isFullScreen() : false;
+});
+
+//FOCAL POINT CACHE FOR SMART FOCUS, KEPT SEPARATE FROM THE PREFERENCES SO IT DOES NOT BLOAT THEM
+ipcMain.handle('save-focus-cache', async (event, message) => {
+  try {
+    const filePath = path.join(app.getPath('userData'), "digital-picture-focus.json");
+    await fs.promises.writeFile(filePath, message, 'utf-8');
+  }
+  catch (error) {
+    console.log(error);
+  }
+});
+
+ipcMain.handle('load-focus-cache', async () => {
+  try {
+    const filePath = path.join(app.getPath('userData'), "digital-picture-focus.json");
+    return await fs.promises.readFile(filePath, 'utf-8');
+  }
+  catch (error) {
+    return "";
+  }
 });
 
 ipcMain.handle('get-files-directories', async (event, directoryPath) => {

@@ -4,6 +4,17 @@ const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 module.exports = {
   packagerConfig: {
     asar: true,
+    //ONLY THE ELECTRON FILES AND THE BUILT ANGULAR APP (dist) ARE NEEDED AT RUNTIME
+    ignore: [
+      /^\/src($|\/)/,
+      /^\/out($|\/)/,
+      /^\/\.angular($|\/)/,
+      /^\/\.vscode($|\/)/,
+      /^\/angular\.json$/,
+      /^\/tsconfig.*\.json$/,
+      /^\/notes\.txt$/,
+      /^\/\.editorconfig$/,
+    ],
   },
   rebuildConfig: {},
   makers: [

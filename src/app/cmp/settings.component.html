@@ -1,121 +1,210 @@
-
-
-<div style="flex-direction:column;">
-  <div class="page-header">Preferences</div>
-
-  <div class="page-sub-header">Directories</div>
-  <div class="card-content">
-    <mat-card appearance="outlined" style="width:100%;margin-bottom:10px;">
-      <mat-card-content class="group-restrictions">
-        <div class="group-imput">
-          <mat-form-field appearance="outline">
-            <mat-label>Group</mat-label>
-            <input matInput placeholder="Group Name" [(ngModel)]="newGroup">
-          </mat-form-field>
-          <div><button mat-raised-button (click)="addGroup()">Add</button></div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    @for (grp of preferences.groups; track grp) {
-    <mat-card appearance="outlined" style="width:100%;">
-      <mat-card-content>
-        <table cellpadding="0" cellspacing="0" class="pref-table">
-          <thead>
-            <tr>
-              <th style="width:5%;cursor:pointer;"><mat-icon style="cursor:pointer;" title="Remove this Group" color="warn" class="cancel-button" (click)="removeGroup(grp)">cancel</mat-icon></th>
-              <th style="width:65%">
-                <div style=" display: flex; flex-direction: row;">
-                  <div style="width:30px;">
-                    <mat-icon title="Gurrent Active Group" style="color: #05d105; cursor: pointer;" [style.display]="preferences.currentGroup == grp.name ? '' : 'none'">stars</mat-icon>
-                  </div>
-                  <div style="padding-top: 2px;">{{grp.name}}: Directories</div>
-                </div>
-              </th>
-              <th>Sub Folders</th>
-              <th style="text-align:right;"><mat-icon title="Build Play List" (click)="buildPlayList(grp)">build</mat-icon></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (dir of grp.directories; track dir) {
-            <tr>
-              <td><mat-icon title="Remove this Directory" color="warn" class="cancel-button" style="{{dir.path==''||dir.path==null ? 'display:none' : '' }};cursor:pointer;" (click)="removeDirectory(dir, grp)">cancel</mat-icon></td>
-              <td>{{ dir.path}} </td>
-              <td style="width:15%"><mat-slide-toggle [(ngModel)]="dir.include"></mat-slide-toggle></td>
-              <td style="width:15%"><button mat-raised-button (click)="selectDirectory(dir, grp)">Browse...</button></td>
-            </tr>
-            }
-          </tbody>
-        </table>
-      </mat-card-content>
-    </mat-card>
+<div class="prefs">
+  <header class="prefs-bar">
+    <button type="button" mat-icon-button aria-label="Back to slideshow" matTooltip="Back to slideshow" (click)="back()"><mat-icon>arrow_back</mat-icon></button>
+    <h1>Preferences</h1>
+    <span class="prefs-saved" [class.show]="justSaved" aria-live="polite">
+      @if (justSaved) {
+      <mat-icon>check_circle</mat-icon> Saved
+      }
+    </span>
+  </header>
+  @if (isLoading) {
+  <mat-progress-bar mode="indeterminate" class="prefs-progress"></mat-progress-bar>
   }
-  </div>
-  <!--div class="setting-save"><button mat-raised-button (click)="reBuildPlayList()">ReBuild Play List</button></div-->
-  <div class="page-sub-header">Options</div>
-  <div class="card-content">
-    <mat-card appearance="outlined" style="width:100%;">
-      <mat-card-content>
-        <div class="setting">
-          <div><mat-slide-toggle [(ngModel)]="preferences.crop"></mat-slide-toggle></div>
-          <div>Don't crop the image</div>
+
+  <main class="prefs-body">
+
+    <!-- IMAGE GROUPS -->
+    <section class="prefs-section">
+      <h2>Image groups</h2>
+      <p class="prefs-hint">A group is a set of folders played together. Pick which group plays from the slideshow's Image groups button.</p>
+
+      <div class="prefs-card prefs-new-group">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>New group name</mat-label>
+          <input matInput [(ngModel)]="newGroup" (keydown.enter)="addGroup()" (ngModelChange)="groupError = ''">
+          @if (groupError) {
+          <mat-hint class="prefs-error">{{ groupError }}</mat-hint>
+          }
+        </mat-form-field>
+        <button type="button" mat-flat-button (click)="addGroup()" [disabled]="!newGroup.trim()"><mat-icon>add</mat-icon> Add group</button>
+      </div>
+
+      @for (grp of preferences.groups; track grp) {
+      <div class="prefs-card prefs-group" [class.active]="preferences.currentGroup == grp.name">
+        <div class="prefs-group-head">
+          <mat-icon class="prefs-group-icon">photo_library</mat-icon>
+          <div class="prefs-group-name">{{ grp.name }}</div>
+          @if (preferences.currentGroup == grp.name) {
+          <span class="prefs-chip">Playing</span>
+          }
+          <span class="prefs-spacer"></span>
+          <button type="button" mat-stroked-button (click)="buildPlayList(grp)" [disabled]="grp.directories.length == 0 || isLoading">
+            <mat-icon>{{ preferences.currentGroup == grp.name ? 'refresh' : 'play_arrow' }}</mat-icon>
+            {{ preferences.currentGroup == grp.name ? 'Rebuild' : 'Play this group' }}
+          </button>
+          <button type="button" mat-icon-button aria-label="Delete group" matTooltip="Delete group" (click)="removeGroup(grp)"><mat-icon>delete_outline</mat-icon></button>
         </div>
-        <div class="setting-select" [style]="preferences.crop==false ? 'display:none': ''">
-          <mat-form-field appearance="outline" style="width:50%">
-            <mat-label>Position</mat-label>
-            <mat-select [(ngModel)]="preferences.position">
-              <mat-option value="TOP">Starting at the top of the Image</mat-option>
-              <mat-option value="CENTER">Starting from the center of the Image</mat-option>
-            </mat-select>
-          </mat-form-field>
+
+        @for (dir of grp.directories; track dir) {
+        <div class="prefs-folder">
+          <mat-icon class="prefs-folder-icon">folder</mat-icon>
+          <div class="prefs-folder-path" [matTooltip]="dir.path" matTooltipShowDelay="600">{{ dir.path }}</div>
+          <mat-slide-toggle [(ngModel)]="dir.include" (ngModelChange)="changed()">Subfolders</mat-slide-toggle>
+          <button type="button" mat-icon-button aria-label="Remove folder" matTooltip="Remove folder" (click)="removeDirectory(dir, grp)"><mat-icon>close</mat-icon></button>
         </div>
-        <div class="setting">
-          <div><mat-slide-toggle [(ngModel)]="preferences.useimage"></mat-slide-toggle></div>
-          <div>Use faded image on filler spaces</div>
-        </div>
-        <div style="padding-bottom:10px;">
-          <div class="settings-color">
-            <input class="color-input" [(colorPicker)]="preferences.backColor" [style.background]="preferences.backColor" />
+        } @empty {
+        <div class="prefs-empty">No folders yet</div>
+        }
+
+        <button type="button" mat-button class="prefs-add-folder" (click)="addFolder(grp)"><mat-icon>create_new_folder</mat-icon> Add folder</button>
+      </div>
+      } @empty {
+      <div class="prefs-card prefs-empty">Create a group above, then add folders of images to it.</div>
+      }
+    </section>
+
+    <!-- SLIDESHOW -->
+    <section class="prefs-section">
+      <h2>Slideshow</h2>
+      <div class="prefs-card">
+        <div class="prefs-row">
+          <div class="prefs-label">
+            <div>Show each image for</div>
           </div>
-          <div class="color-text">Background color</div>
-        </div>
-        <div class="setting-select">
-          <mat-form-field appearance="outline">
-            <mat-label>Timer Rotation Interval</mat-label>
-            <input matInput placeholder="Timer Rotation Interval" [(ngModel)]="preferences.timer">
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Interval</mat-label>
-            <mat-select [(ngModel)]="preferences.interval">
-              <mat-option value="M">Minute(s)</mat-option>
-              <mat-option value="S">Second(s)</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <div>Image rotation timer</div>
-        </div>
-        <div class="setting-select">
-          <mat-form-field appearance="outline">
-            <mat-label>Order By</mat-label>
-            <mat-select [(ngModel)]="preferences.orderby">
-              <mat-option value="CREATED">Created Date</mat-option>
-              <mat-option value="NAME">Image Name</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Direction</mat-label>
-            <mat-select [(ngModel)]="preferences.direction">
-              <mat-option value="ASC">Ascending</mat-option>
-              <mat-option value="DESC">Descending</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <div>Order images by Name or Created Date</div>
+          <div class="prefs-controls">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="prefs-narrow">
+              <input matInput type="number" min="1" aria-label="Interval" [(ngModel)]="preferences.timer" (ngModelChange)="changed()">
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="prefs-medium">
+              <mat-select aria-label="Interval unit" [(ngModel)]="preferences.interval" (ngModelChange)="changed()">
+                <mat-option value="S">seconds</mat-option>
+                <mat-option value="M">minutes</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
         </div>
 
-        <mat-progress-bar mode="indeterminate" [style.display]="isLoading?'':'none'"></mat-progress-bar>
+        <div class="prefs-row">
+          <div class="prefs-label">
+            <div>Transition</div>
+            <div class="prefs-hint">Plays when images show for longer than 10 seconds</div>
+          </div>
+          <div class="prefs-controls">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="prefs-wide">
+              <mat-select aria-label="Transition" [(ngModel)]="preferences.transition" (ngModelChange)="changed()">
+                <mat-option value="NONE">None</mat-option>
+                <mat-option value="FADE">Fade</mat-option>
+                <mat-option value="BLACK">Fade through black</mat-option>
+                <mat-option value="SLIDE_LEFT">Slide left</mat-option>
+                <mat-option value="SLIDE_UP">Slide up</mat-option>
+                <mat-option value="ZOOM">Zoom</mat-option>
+                <mat-option value="WIPE">Wipe</mat-option>
+                <mat-option value="RANDOM">Random</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
 
-      </mat-card-content>
-    </mat-card>
-  </div>
+        <div class="prefs-row">
+          <div class="prefs-label">
+            <div>Order</div>
+            <div class="prefs-hint">Applies the next time a play list is built</div>
+          </div>
+          <div class="prefs-controls">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="prefs-medium">
+              <mat-select aria-label="Order by" [(ngModel)]="preferences.orderby" (ngModelChange)="changed()">
+                <mat-option value="NAME">Name</mat-option>
+                <mat-option value="CREATED">Date modified</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="prefs-medium">
+              <mat-select aria-label="Direction" [(ngModel)]="preferences.direction" (ngModelChange)="changed()">
+                <mat-option value="ASC">{{ preferences.orderby == 'NAME' ? 'A to Z' : 'Oldest first' }}</mat-option>
+                <mat-option value="DESC">{{ preferences.orderby == 'NAME' ? 'Z to A' : 'Newest first' }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  <div class="setting-save"><button mat-raised-button (click)="saveSettings()">Save</button></div>
+    <!-- DISPLAY -->
+    <section class="prefs-section">
+      <h2>Display</h2>
+      <div class="prefs-card">
+        <div class="prefs-row">
+          <div class="prefs-label">
+            <div>Fill the screen</div>
+            <div class="prefs-hint">Crops the edges so there are no empty bars</div>
+          </div>
+          <div class="prefs-controls">
+            <mat-slide-toggle aria-label="Fill the screen" [(ngModel)]="preferences.crop" (ngModelChange)="changed()"></mat-slide-toggle>
+          </div>
+        </div>
+
+        @if (preferences.crop) {
+        <div class="prefs-row">
+          <div class="prefs-label">
+            <div>Focus on</div>
+            <div class="prefs-hint">Which part of the image stays in view when cropping</div>
+          </div>
+          <div class="prefs-controls">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="prefs-wide">
+              <mat-select aria-label="Focus on" [(ngModel)]="preferences.position" (ngModelChange)="changed()">
+                <mat-option value="SMART">Faces and main subject (smart)</mat-option>
+                <mat-option value="CENTER">Center of the image</mat-option>
+                <mat-option value="TOP">Top of the image</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+        } @else {
+        <div class="prefs-row">
+          <div class="prefs-label">
+            <div>Faded fill</div>
+            <div class="prefs-hint">Shows a faded copy of the image in the empty space</div>
+          </div>
+          <div class="prefs-controls">
+            <mat-slide-toggle aria-label="Faded fill" [(ngModel)]="preferences.useimage" (ngModelChange)="changed()"></mat-slide-toggle>
+          </div>
+        </div>
+        }
+
+        <div class="prefs-row">
+          <div class="prefs-label">
+            <div>Background color</div>
+            <div class="prefs-hint">Behind images that don't fill the screen</div>
+          </div>
+          <div class="prefs-controls">
+            <button type="button" class="prefs-swatch" aria-label="Background color" [style.background]="preferences.backColor"
+              [(colorPicker)]="preferences.backColor" (colorPickerChange)="changed()" cpPosition="left"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- APPEARANCE -->
+    <section class="prefs-section">
+      <h2>Appearance</h2>
+      <div class="prefs-card">
+        <div class="prefs-row">
+          <div class="prefs-label">
+            <div>Theme</div>
+            <div class="prefs-hint">For these menus and settings. The slideshow is always dark.</div>
+          </div>
+          <div class="prefs-controls">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="prefs-medium">
+              <mat-select aria-label="Theme" [(ngModel)]="preferences.theme" (ngModelChange)="changed()">
+                <mat-option value="SYSTEM">Use system setting</mat-option>
+                <mat-option value="LIGHT">Light</mat-option>
+                <mat-option value="DARK">Dark</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
 </div>

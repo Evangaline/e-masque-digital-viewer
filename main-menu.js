@@ -56,7 +56,8 @@ const template = [
   }
 ]
 
-if (process.env.NODE_ENV !== 'production') {
+//DEVELOPER TOOLS ARE ONLY AVAILABLE WHEN RUNNING FROM SOURCE, NOT IN THE INSTALLED APP
+if (!app.isPackaged) {
   template.push({
     label: 'Developer',
     submenu: [
@@ -116,16 +117,21 @@ function nextPlay() {
 
 const contextTemplate = [
   {
-    label: 'Options',
-    submenu: [
-      {
-        label: 'Dow Something',
-        click: async () => { console.log('Help!!!'); }
-      }
-    ]
+    label: 'Play',
+    click: async () => { startPlay(); }
   },
   {
-    label: 'More Options'
+    label: 'Pause',
+    click: async () => { pausePlay(); }
+  },
+  {
+    label: 'Next',
+    click: async () => { nextPlay(); }
+  },
+  { type: 'separator' },
+  {
+    label: 'Fullscreen',
+    click: async () => { toggleFullscreen(); }
   }
 ]
 
