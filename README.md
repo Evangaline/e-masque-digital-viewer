@@ -1,33 +1,34 @@
 # Digital Picture Viewer
 
-This project was my first step into the electron world.
+A slideshow app for showing your own photo collection on a large TV or display, at the interval you choose.
 
-The application was created because I have a lot of images stored and wanted to view on large screen TV/Display but i wanted to be able set the interval. I had a quick look around and i couldn't find anything for free.
+I have a lot of images stored and wanted to show them on a big screen with my own timing, and I couldn't find anything free that did it. This project was also my first step into the Electron world.
 
-This project and software is for Non-Commercial Use Only.
+![Digital Picture Viewer](src/assets/screenshot_4.jpg)
 
-For Commercial use feel free to contact me.
-
+More screenshots are in [src/assets](src/assets).
 
 ## Features
 
-- Image Groups: Organise folders into groups (e.g. "Holidays", "Wallpaper") and switch between them from the slideshow. Sub folders can be included per folder.
-- Slideshow: Displays images (jpg, png, gif, webp, bmp) from the folders in the current group, ordered by name or date modified.
-- Custom Interval: Select the duration between image changes, in minutes or seconds.
-- Transitions: Fade, fade through black, slide left, slide up, zoom, wipe or random. Transitions play when the interval is longer than 10 seconds.
-- Fill the Screen: Crop images to fill the screen, focusing on the top, the center, or smart focus.
-- Smart Focus: Finds the faces (or the main subject when there are none) in each image and keeps them in view when cropping. Runs offline, results are cached.
-- Fit Mode: When not filling the screen the image is fitted to the height, any remaining space can show a faded version of the image behind. The background color is also configurable.
-- Controls: Move the mouse or press a key to show the controls (previous, play/pause, next, up next, image groups, preferences, full screen). They hide again after a few seconds, along with the cursor.
-- Up Next: See the remaining images, jump to one, or remove it from the play list.
-- Light/Dark: The preferences follow the Windows light/dark setting, or can be set to light or dark.
-- Power Management: The application temporarily disables the power management so the display will not go to sleep.
+**Slideshow**
+- **Image groups**: organise folders into groups (e.g. "Holidays", "Wallpaper") and switch between them from the slideshow. Subfolders can be included per folder.
+- **Interval**: choose how long each image is shown, in seconds or minutes.
+- **Order**: by name or date modified, in either direction.
+- **Transitions**: fade, fade through black, slide left, slide up, zoom, wipe or random. They play when the interval is longer than 10 seconds.
+- **Formats**: jpg, png, gif, webp and bmp.
 
-![roFrame](src/assets/screenshot_4.jpg)
+**Display**
+- **Fill the screen**: crop images to fill the screen, keeping the top, the center, or the faces and main subject in view.
+- **Smart focus**: finds the faces (or the main subject when there are none) in each image. Runs offline, and results are cached.
+- **Fit mode**: when not filling the screen, images are fitted to the height. The space around them can show a faded copy of the image, and the background color is configurable.
 
-Other screen shot can be seen in the ./src/assets directory
+**Controls**
+- Move the mouse or press a key to show the controls: previous, play/pause, next, up next, image groups, preferences and full screen. They hide again after a few seconds, along with the cursor.
+- **Up next**: see the remaining images, jump to one, or remove it from the play list.
+- **Light/dark**: preferences follow the Windows light/dark setting, or can be set to light or dark.
+- **Keeps the screen on**: the display won't go to sleep while the app is running.
 
-## Keyboard Shortcuts
+## Keyboard shortcuts
 
 | Key | Action |
 |---|---|
@@ -35,41 +36,62 @@ Other screen shot can be seen in the ./src/assets directory
 | → / ← | Next / previous image |
 | F or F11 | Toggle full screen |
 | Esc | Close the up next list, or leave full screen |
-| F1 / F2 / F3 | Play / pause / next (menu shortcuts) |
+| F1 / F2 / F3 | Play / pause / next |
 
-## Install Application without Compiling
+## Install
 
-Download the Windows exe files.
+Download **digital-picture-x.x.x.Setup.exe** from the [latest release](https://github.com/Evangaline/e-masque-digital-viewer/releases/latest) and run it. It installs the app and adds Start menu and desktop shortcuts.
 
-Settings are saved automatically in your user directory:
+The installer isn't code-signed, so Windows may show "Windows protected your PC". Click **More info**, then **Run anyway**.
 
-- ..\AppData\Roaming\digital-picture\digital-picture-preferences.json (preferences, groups and the current play list)
-- ..\AppData\Roaming\digital-picture\digital-picture-focus.json (smart focus cache, safe to delete, it is rebuilt as images are shown)
+Settings are saved automatically in `%APPDATA%\digital-picture\`:
 
-## Requirements for Development
+| File | Contents |
+|---|---|
+| `digital-picture-preferences.json` | Preferences, groups and the current play list |
+| `digital-picture-focus.json` | Smart focus cache. Safe to delete; it's rebuilt as images are shown |
 
-- Node.js 24 LTS (recommended). Angular 22 needs 22.22.3 or later, and Node 26 is not yet supported for packaging (`npm run make` stops part way through without an error). If you use nvm: `nvm install 24 && nvm use 24`
+## Development
+
+### Requirements
+
+- **Node.js 24 LTS.** Angular 22 needs Node 22.22.3 or later, and Node 26 isn't supported for packaging yet (`npm run make` stops part way through without an error). With nvm:
+
+  ```bash
+  nvm install 24
+  nvm use 24
+  ```
+
 - Built with Angular 22, Angular Material 22 and Electron 44.
 
-## Development Run:
- * npm install
- * npm run electron-build
+### Run
 
-## Tests:
- * npm test
+```bash
+npm install
+npm run electron-build
+```
 
-## Development Build / Publish:
- * npm run make
+### Test
 
-This builds the Angular app and then the installer.
+```bash
+npm test
+```
 
-Before running a "make" command make sure you delete everything in your "out" directory.
+### Build the installer
 
-if you see the error:
+```bash
+npm run make
+```
 
-    This is a dummy update.exe.  If you are seeing this, your build did not correctly replace the IDR_UPDATE_ZIP resource.
+This builds the Angular app, then the Windows installer in `out\make\squirrel.windows\x64\`.
 
-This probaly because you forgot to delete the "out" directory and your exe file is too big.
+Delete the `out` folder before each build. If you see this error:
+
+```
+This is a dummy update.exe.  If you are seeing this, your build did not correctly replace the IDR_UPDATE_ZIP resource.
+```
+
+the `out` folder probably wasn't deleted first, and the exe ended up too big.
 
 ## Credits
 
@@ -78,8 +100,8 @@ This probaly because you forgot to delete the "out" directory and your exe file 
 
 ## License
 
-[License](LICENSE)
+This software is for non-commercial use only. For commercial use, please get in touch. See [LICENSE](LICENSE) for details.
 
 ## Author
 
-This project was created by Nick Coleman in 2025.
+Created by Nick Coleman in 2025.
